@@ -1,12 +1,16 @@
-# Ignore Python cache and compiled files
+# Python cache
 __pycache__/
 *.pyc
 
-# Ignore virtual environment
+# Virtual environment
 venv/
 
-# Ignore SQLite database
+# SQLite database
 db.sqlite3
 
-# Optional: ignore staticfiles if Django collects them
-staticfiles/
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
