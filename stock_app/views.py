@@ -39,13 +39,14 @@ def results(request):
 
 
     try:
-        df, chart, error = process_stock_data(ticker, period, forecast_days, chart_type)
+        df, _, chart, error = process_stock_data(ticker, period, forecast_days, chart_type)
     except Exception as e:
+        print("DEBUG ERROR:", e)   # 👈 ADD THIS
         return render(request, 'stock_app/results.html', {
-            'error': "Server overloaded. Try again.",
+            'error': str(e),   # 👈 SHOW REAL ERROR
             'ticker': ticker
         })
-    
+
     if error:
         return render(request, 'stock_app/results.html', {
             'error': error,
