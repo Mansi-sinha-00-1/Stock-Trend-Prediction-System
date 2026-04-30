@@ -8,25 +8,30 @@ import base64
 from io import BytesIO
 import matplotlib
 matplotlib.use('Agg')   
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import logging
+import time
 
 # Set up logger
 logger = logging.getLogger(__name__)
+logger.info("Processing started")
 
 # ------------------------------
 # Fetch stock data using yfinance
 # ------------------------------ 
 def fetch_stock_data(ticker, period='1y'):
     try:
+        time.sleep(1)
         stock = yf.Ticker(ticker)
         df = stock.history(period=period)
+
         if df.empty:
-            return None, "No data found for this ticker."
+            return None, "No data found"
+
         return df, None
+
     except Exception as e:
-        logger.error(f"Error fetching data for {ticker}: {str(e)}")
-        return None, f"Error fetching data: {str(e)}"
+        return None, f"API Error: {str(e)}"
 
 # ------------------------------
 # Prepare data for prediction (safe)
@@ -112,6 +117,7 @@ def generate_plotly_chart(actual_df, predicted_df, ticker):
 # Generate Matplotlib chart
 # ------------------------------
 def generate_matplotlib_chart(actual_df, predicted_df, ticker):
+    import matplotlib.pyplot as plt
     plt.figure(figsize=(12, 6))
     plt.plot(actual_df.index, actual_df['Close'], label='Actual Price', color='blue')
     plt.plot(predicted_df.index, predicted_df['Predicted_Close'],
@@ -136,6 +142,7 @@ def generate_matplotlib_chart(actual_df, predicted_df, ticker):
 def process_stock_data(ticker, period='1y', forecast_days=30, chart_type='plotly'):
     # 1. Fetch data
     df, error = fetch_stock_data(ticker, period)
+
     if error:
         return None, None, None, error
 
@@ -166,4 +173,4 @@ def process_stock_data(ticker, period='1y', forecast_days=30, chart_type='plotly
         predictions.rename(columns={'Predicted_Close': 'Predicted_Close'})
     ], axis=1)
 
-    return combined_df, chart, None
+    return combined_df, None, chart, None

@@ -73,7 +73,9 @@
                 
                 <div class="chart-container mb-4">
                     {% if chart_type == 'plotly' %}
-                        {{ chart|safe }}
+                        <div id="plotly-chart">
+                            {{ chart|safe }}
+                        </div>
                     {% else %}
                         <img src="data:image/png;base64,{{ chart }}" alt="{{ ticker }} Stock Chart" class="img-fluid">
                     {% endif %}

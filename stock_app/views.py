@@ -38,8 +38,14 @@ def results(request):
     chart_type = request.session['chart_type']
 
 
-    df, chart, error = process_stock_data(ticker, period, forecast_days, chart_type)
-
+    try:
+        df, chart, error = process_stock_data(ticker, period, forecast_days, chart_type)
+    except Exception as e:
+        return render(request, 'stock_app/results.html', {
+            'error': "Server overloaded. Try again.",
+            'ticker': ticker
+        })
+    
     if error:
         return render(request, 'stock_app/results.html', {
             'error': error,
@@ -47,7 +53,7 @@ def results(request):
         })
 
     # Save CSV to session for download
-    csv_data = df.to_csv(index=True)
+    csv_data = df.head(500).to_csv(index=True)
     request.session['csv_data'] = csv_data
 
     context = {
