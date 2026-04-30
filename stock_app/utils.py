@@ -166,4 +166,4 @@ def process_stock_data(ticker, period='1y', forecast_days=30, chart_type='plotly
         predictions.rename(columns={'Predicted_Close': 'Predicted_Close'})
     ], axis=1)
 
-    return combined_df, None, chart, None
+    return combined_df, chart, None

@@ -29,13 +29,9 @@ class StockForm(forms.Form):
         ('matplotlib', 'Static (Matplotlib)'),
     ]
     
-    ticker = forms.CharField(
-        label='Stock Ticker',
-        max_length=10,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'e.g. AAPL, MSFT, GOOGL'
-        })
+    ticker = forms.ChoiceField(
+        choices=TICKER_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
     
     period = forms.ChoiceField(
