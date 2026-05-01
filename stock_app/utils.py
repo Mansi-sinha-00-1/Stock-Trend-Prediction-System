@@ -8,17 +8,15 @@ import base64
 from io import BytesIO
 import matplotlib
 matplotlib.use('Agg')   
-# import matplotlib.pyplot as plt
 import logging
 import time
 
-# Set up logger
 logger = logging.getLogger(__name__)
 logger.info("Processing started")
 
-# ------------------------------
+# -------------------------------
 # Fetch stock data using yfinance
-# ------------------------------ 
+# -------------------------------
 def fetch_stock_data(ticker, period='1y'):
     try:
         time.sleep(1)
@@ -33,14 +31,13 @@ def fetch_stock_data(ticker, period='1y'):
     except Exception as e:
         return None, f"API Error: {str(e)}"
 
-# ------------------------------
-# Prepare data for prediction (safe)
-# ------------------------------
+# ---------------------------
+# Prepare data for prediction 
+# ---------------------------
 def prepare_data(df, forecast_days=30):
     df = df[['Close']].copy()
     df['Prediction'] = df['Close'].shift(-forecast_days)
 
-    # Check: enough rows
     if len(df) <= forecast_days:
         return None, None, None, forecast_days, "Not enough data for the given forecast days."
 
@@ -60,14 +57,13 @@ def train_model(X, y):
     model.fit(X_train, y_train)
     return model, X_test, y_test
 
-# ------------------------------
+# -----------------------
 # Make future predictions
-# ------------------------------
+# -----------------------
 def make_predictions(model, df, forecast_days):
     x_forecast = np.array(df.drop(['Prediction'], axis=1))[-forecast_days:]
     y_pred = model.predict(x_forecast)
 
-    # Create future date index
     last_date = df.index[-1]
     future_dates = pd.date_range(last_date, periods=forecast_days + 1)[1:]
 
@@ -78,9 +74,9 @@ def make_predictions(model, df, forecast_days):
 
     return predictions
 
-# ------------------------------
+# ---------------------
 # Generate Plotly chart
-# ------------------------------
+# ---------------------
 def generate_plotly_chart(actual_df, predicted_df, ticker):
     fig = go.Figure()
 
@@ -113,9 +109,9 @@ def generate_plotly_chart(actual_df, predicted_df, ticker):
 
     return fig.to_html(full_html=False)
 
-# ------------------------------
+# -------------------------
 # Generate Matplotlib chart
-# ------------------------------
+# -------------------------
 def generate_matplotlib_chart(actual_df, predicted_df, ticker):
     import matplotlib.pyplot as plt
     plt.figure(figsize=(12, 6))
@@ -136,9 +132,9 @@ def generate_matplotlib_chart(actual_df, predicted_df, ticker):
 
     return base64.b64encode(buffer.read()).decode('utf-8')
 
-# ------------------------------
-# Main processing pipeline (safe)
-# ------------------------------
+# ------------------------
+# Main processing pipeline
+# ------------------------
 def process_stock_data(ticker, period='1y', forecast_days=30, chart_type='plotly'):
     # 1. Fetch data
     df, error = fetch_stock_data(ticker, period)

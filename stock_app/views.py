@@ -13,7 +13,6 @@ def index(request):
             forecast_days = form.cleaned_data['forecast_days']
             chart_type = form.cleaned_data['chart_type']
 
-            # Save to session for later use
             request.session['ticker'] = ticker
             request.session['period'] = period
             request.session['forecast_days'] = forecast_days
@@ -27,7 +26,6 @@ def index(request):
 
 
 def results(request):
-    # Check required session data
     required_keys = ['ticker', 'period', 'forecast_days', 'chart_type']
     if not all(k in request.session for k in required_keys):
         return redirect('stock_app:index')
@@ -41,9 +39,9 @@ def results(request):
     try:
         df, _, chart, error = process_stock_data(ticker, period, forecast_days, chart_type)
     except Exception as e:
-        print("DEBUG ERROR:", e)   # 👈 ADD THIS
+        print("DEBUG ERROR:", e)
         return render(request, 'stock_app/results.html', {
-            'error': str(e),   # 👈 SHOW REAL ERROR
+            'error': str(e),
             'ticker': ticker
         })
 
@@ -53,7 +51,6 @@ def results(request):
             'ticker': ticker
         })
 
-    # Save CSV to session for download
     csv_data = df.head(500).to_csv(index=True)
     request.session['csv_data'] = csv_data
 
@@ -83,7 +80,6 @@ def download_csv(request):
 
 
 def download_chart(request):
-    # Ensure session has the same keys
     required_keys = ['ticker', 'period', 'forecast_days']
     if not all(k in request.session for k in required_keys):
         return redirect('stock_app:index')
@@ -92,13 +88,11 @@ def download_chart(request):
     period = request.session['period']
     forecast_days = request.session['forecast_days']
 
-    # Always use Matplotlib for download (more stable for binary files)
     df, _, chart_base64, error = process_stock_data(ticker, period, forecast_days, chart_type='matplotlib')
 
     if error or df is None:
         return redirect('stock_app:index') 
 
-    # Decode base64 to bytes
     chart_bytes = base64.b64decode(chart_base64)
 
     response = HttpResponse(chart_bytes, content_type='image/png')
